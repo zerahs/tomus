@@ -8,10 +8,11 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class WordController extends AbstractController
 {
+
     /**
      * @Route("/word", name="word")
      */
-    public function index()
+    public function showAction()
     {
         $em = $this->getDoctrine()->getManager();
 
