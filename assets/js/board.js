@@ -1,23 +1,60 @@
 'use strict';
 import React from 'react';
 import ReactDOM from 'react-dom';
+const $ = require('jquery');
 
 const e = React.createElement;
 
-class Square extends React.Component {
+function isLetter(c) {
+  return c && c.toLowerCase() != c.toUpperCase();
+}
 
-	render() {
-		return (
-			<div className="square">
-			</div>
-		);
-	}
+function Square(props) {
+
+	return (
+		<input 
+			type="text"
+			className="square"
+			onInput={props.onInput}
+			onKeyPress={props.onKeyPress}
+		/>
+	);
 }
 
 class Row extends React.Component {
 
 	renderSquare(i) {
-		return <Square />;
+		return <Square
+			onKeyPress={this.onKeyPress}
+			onInput={this.onInput}
+		/>;
+	}
+
+	/*
+	* On key press if not a letter stop propagation
+	*/
+	onKeyPress(e) {
+		let code;
+		if (e.keyCode) code = e.keyCode;
+		else if (e.which) code = e.which;
+		var character = String.fromCharCode(code);
+		if(!isLetter(character)){
+			e.preventDefault();
+			e.stopPropagation();
+			return false;
+		}
+	}
+
+	/*
+	* Replace text by input and focus next square
+	*/
+	onInput(e) {
+		let target = $(e.target);
+		let data = e.nativeEvent.data;
+		if(isLetter(data)){
+			target.val(data.toUpperCase());
+			target.next().focus();
+		}
 	}
 
 	render() {

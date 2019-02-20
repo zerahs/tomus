@@ -3,3 +3,19 @@
 body {
     background-color: lightgray;
 }
+
+
+.square{
+	height: 50px;
+	width: 50px;
+	float: left;
+	border: 1px solid black;
+	padding: 0;
+	line-height: 50px;
+    text-align: center;
+    font-size: 35px;
+}
+
+.board-row{
+	clear: both;
+}
