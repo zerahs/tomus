@@ -14,6 +14,9 @@ body {
 	line-height: 50px;
     text-align: center;
     font-size: 35px;
+    &:disabled{
+    	background: #AAA;
+    }
 }
 
 .board-row{
