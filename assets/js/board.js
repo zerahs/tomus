@@ -125,7 +125,7 @@ class Board extends React.Component {
 	}
 
 	validateAndSubmit() {
-		let data = {'word': 'domino'};
+		let data = {'word': 'diplome'};
 		// Do ajax call to send word to server
 		fetch('http://localhost:8000/board/check', {
 			'method': 'POST',
@@ -134,7 +134,7 @@ class Board extends React.Component {
 		.then(res => res.json())
 		.then(
 			(result) => {
-				console.log(result['test']);
+				console.log(result);
 			},
 			(error) => {
 				console.log(error);
