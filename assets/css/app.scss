@@ -1,7 +1,7 @@
 @import "~bootstrap/scss/bootstrap";
 
 body {
-    background-color: lightgray;
+    background-color: #b9eaff;
 }
 
 
@@ -9,13 +9,19 @@ body {
 	height: 50px;
 	width: 50px;
 	float: left;
-	border: 1px solid black;
+	border: 1px solid #4ec2f4;
 	padding: 0;
 	line-height: 50px;
     text-align: center;
     font-size: 35px;
-    &:disabled{
-    	background: #AAA;
+    background: #2188d7;
+    color: white;
+    outline: none;
+    &.color1{
+    	background: #deaf28;
+    }
+    &.color2{
+    	background: #b5262e;
     }
 }
 

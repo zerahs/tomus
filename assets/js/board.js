@@ -54,7 +54,7 @@ class Board extends React.Component {
 
 		this.state = {
 			nbCols: 7,
-			nbRows: 5,
+			nbRows: 20,
 			currentRow: 0,
 		}
 
@@ -117,38 +117,68 @@ class Board extends React.Component {
 		}
 		// Enter
 		else if(code==13){
-			this.validateAndSubmit();
+			this.validateAndSubmitWord();
 		}
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
 	}
 
-	validateAndSubmit() {
-		let data = {'word': 'diplome'};
-		// Do ajax call to send word to server
-		fetch('http://localhost:8000/board/check', {
-			'method': 'POST',
-			'body': JSON.stringify(data),
-		})
-		.then(res => res.json())
-		.then(
-			(result) => {
-				console.log(result);
-			},
-			(error) => {
-				console.log(error);
-			}
-		)
+	getCurrentWord() {
+		let inputs = $(".board-row").eq(this.state.currentRow).find('input');
+		let word = "";
+		inputs.each(function(){
+			word += $(this).val();
+		});
+		return word;
+	}
 
+	newLine() {
 		const newRow = this.state.currentRow + 1;
 		if(newRow >= this.state.nbRows){
 			//END GAME
 		}
 		// go to next line
 		this.setState({currentRow:newRow});
-		let temp = $('input:enabled:first');
-		temp.focus();
+	}
+
+	correctCurrentWord(diff) {
+		let inputs = $(".board-row").eq(this.state.currentRow).find('input');
+		inputs.each(function(i){
+			$(this).addClass('color'+diff.charAt(i));
+		});
+	}
+
+	validateAndSubmitWord() {
+		let data = {'word': this.getCurrentWord()};
+		let diff = false;
+
+		fetch('http://localhost:8000/board/word-check', {
+			'method': 'POST',
+			'body': JSON.stringify(data),
+		})
+		.then(res => res.json())
+		.then(
+			(result) => {
+				if(result.error){
+					console.log('result.error ', result.error);
+					return;
+				}
+				diff = result.diff;
+			},
+			(error) => console.log('(error) ', result.error)
+		)
+		.then(
+			() => {
+				if(diff){
+					this.correctCurrentWord(diff);
+				}
+				this.newLine();
+			}
+		)
+		.catch(
+			(error) => console.log('error catch ', error)
+		);
 	}
 
 	render() {

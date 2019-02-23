@@ -30,9 +30,9 @@ class BoardController extends AbstractController
     // }
 
     /**
-     * @Route("/check", name="board_check")
+     * @Route("/word-check", name="board_word_check")
      */
-    public function checkAction(Request $request)
+    public function wordCheckAction(Request $request)
     {
         // @TODO : solution will be found from token sent in request
         $solution = 'dominos';
@@ -46,24 +46,27 @@ class BoardController extends AbstractController
 
             // Check sent word against solution
             $word = $data['word'];
-            dump( strlen($word), strlen($solution) );
+            dump( $word, $solution );
             if(!is_string($word) || !is_string($solution) || strlen($word)!=strlen($solution)){
                 return new JsonResponse(["error"=>"Invalid word or lengths don't match"]);
             }
-            $solutionLetters = $solution;
+            $word = strtolower($word);
+            $solutionPool = $solution;
+            $wordPool = $word;
             $diff = implode("", array_fill(0, strlen($word), "0")); // init with 0s
             // First loop finds same characters at the right index
             for($i=0; $i<strlen($word); $i++) {
                 if($word[$i] == $solution[$i]) {
                     $diff[$i] = "2";
-                    $solutionLetters[$i] = "0";
+                    $solutionPool[$i] = "0";
+                    $wordPool[$i] = "1";
                 }
             }
             // Second loop finds right character at the wrong index
-            for($i=0; $i<strlen($word); $i++) {
-                if( strpos($solutionLetters, $word[$i]) !== false ) {
+            for($i=0; $i<strlen($wordPool); $i++) {
+                if( strpos($solutionPool, $wordPool[$i]) !== false ) {
                     $diff[$i] = "1";
-                    $solutionLetters[$i] = "0";
+                    $solutionPool[$i] = "0";
                 }
             }
             
