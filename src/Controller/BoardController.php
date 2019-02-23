@@ -46,7 +46,6 @@ class BoardController extends AbstractController
 
             // Check sent word against solution
             $word = $data['word'];
-            dump( $word, $solution );
             if(!is_string($word) || !is_string($solution) || strlen($word)!=strlen($solution)){
                 return new JsonResponse(["error"=>"Invalid word or lengths don't match"]);
             }
@@ -62,12 +61,15 @@ class BoardController extends AbstractController
                     $wordPool[$i] = "1";
                 }
             }
+
             // Second loop finds right character at the wrong index
             for($i=0; $i<strlen($wordPool); $i++) {
-                if( strpos($solutionPool, $wordPool[$i]) !== false ) {
+                $pos = strpos($solutionPool, $wordPool[$i]);
+                if( $pos !== false ) {
                     $diff[$i] = "1";
-                    $solutionPool[$i] = "0";
+                    $solutionPool[$pos] = "0";
                 }
+                dump($wordPool[$i].' '.$wordPool.' '.$solutionPool);
             }
             
             return new JsonResponse(["diff"=>$diff]);
