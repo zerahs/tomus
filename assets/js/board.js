@@ -10,10 +10,6 @@ function isLetter(c) {
  	// return c.length === 1 && c.match(/[a-z]/i);
 }
 
-
-// TODO
-// Set all squares disabled except the one with focus ?
-// Or set all squares disabled except current row
 function Square(props) {
 
 	return (
@@ -57,8 +53,8 @@ class Board extends React.Component {
 		super(props);
 
 		this.state = {
-			nbCols: 9,
-			nbRows: 6,
+			nbCols: 7,
+			nbRows: 5,
 			currentRow: 0,
 		}
 
@@ -129,10 +125,27 @@ class Board extends React.Component {
 	}
 
 	validateAndSubmit() {
+		let data = {'word': 'domino'};
+		// Do ajax call to send word to server
+		fetch('http://localhost:8000/board/check', {
+			'method': 'POST',
+			'body': JSON.stringify(data),
+		})
+		.then(res => res.json())
+		.then(
+			(result) => {
+				console.log(result['test']);
+			},
+			(error) => {
+				console.log(error);
+			}
+		)
+
 		const newRow = this.state.currentRow + 1;
 		if(newRow >= this.state.nbRows){
 			//END GAME
 		}
+		// go to next line
 		this.setState({currentRow:newRow});
 		let temp = $('input:enabled:first');
 		temp.focus();
