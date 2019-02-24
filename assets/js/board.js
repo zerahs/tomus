@@ -9,6 +9,10 @@ function isLetter(c) {
  	return c && c.toLowerCase() != c.toUpperCase();
  	// return c.length === 1 && c.match(/[a-z]/i);
 }
+String.prototype.replaceAt=function(index, replacement) {
+    return this.substr(0, index) + replacement+ this.substr(index + replacement.length);
+}
+
 
 function Square(props) {
 
@@ -47,16 +51,19 @@ class Row extends React.Component {
 	}
 }
 
+//@todo valid letters en rouge toujours affichées
 class Board extends React.Component {
 
 	constructor(props) {
 		super(props);
-		
+		let nbCols = 9;
+		let validLetters = new Array(nbCols).join(' ');
+
 		this.state = {
-			nbCols: 9,
-			nbRows: 11,
+			nbCols: nbCols,
+			nbRows: 20,
 			currentRow: 0,
-			validLetters: null,
+			validLetters: validLetters,
 			solution: null,
 		}
 
@@ -76,6 +83,13 @@ class Board extends React.Component {
 		);
 	}
 
+	fillValidLetters(row) {
+		let inputs = $(".board-row").eq(row).find('input');
+		let validLetters = this.state.validLetters;
+		inputs.each(function(i){
+			$(this).val(validLetters.charAt(i).toUpperCase());
+		});
+	}
 	componentDidUpdate(prevProps) {
 		this.focusFirstAvailableInput();
 	}
@@ -97,7 +111,12 @@ class Board extends React.Component {
 					return;
 				}
 				console.log(result.word);
+				let validLetters = this.state.validLetters;
+				validLetters = validLetters.replaceAt(0, result.word.charAt(0));
+				this.setState({'validLetters': validLetters});
 				this.setState({'solution': result.word});
+				this.fillValidLetters(0);
+
 			},
 			(error) => console.log('(error) ', error)
 		)
@@ -158,7 +177,6 @@ class Board extends React.Component {
 		let input = $(".board-row").eq(this.state.currentRow).find('input:enabled:first');
 		input.focus();
 	}
-
 	
 
 	getCurrentWord() {
@@ -181,9 +199,16 @@ class Board extends React.Component {
 
 	correctCurrentWord(diff) {
 		let inputs = $(".board-row").eq(this.state.currentRow).find('input');
+		let validLetters = this.state.validLetters;
+		let solution = this.state.solution;
 		inputs.each(function(i){
 			$(this).addClass('color'+diff.charAt(i));
+			if(diff.charAt(i) == '2'){
+				validLetters = validLetters.replaceAt(i, solution.charAt(i));
+			}
 		});
+		this.setState({'validLetters': validLetters});
+		this.fillValidLetters(this.state.currentRow + 1);
 	}
 
 	validateAndSubmitWord() {
