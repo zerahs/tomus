@@ -5,8 +5,8 @@ namespace App\Entity;
 class Word
 {
     private $id;
-
     private $letters;
+    private $nbLetters;
 
     public function getId(): ?int
     {
@@ -21,6 +21,18 @@ class Word
     public function setLetters(string $letters): self
     {
         $this->letters = $letters;
+
+        return $this;
+    }
+
+    public function getNbLetters(): ?int
+    {
+        return $this->nbLetters;
+    }
+
+    public function setNbLetters(int $nbLetters): self
+    {
+        $this->nbLetters = $nbLetters;
 
         return $this;
     }

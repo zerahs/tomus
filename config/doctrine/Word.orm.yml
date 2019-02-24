@@ -11,4 +11,7 @@ App\Entity\Word:
   fields:
     letters:
       type: string
-      length: 10
+      length: 15
+    nbLetters:
+      type: smallint
+

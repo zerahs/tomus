@@ -51,28 +51,59 @@ class Board extends React.Component {
 
 	constructor(props) {
 		super(props);
-
+		
 		this.state = {
-			nbCols: 7,
-			nbRows: 20,
+			nbCols: 9,
+			nbRows: 11,
 			currentRow: 0,
+			validLetters: null,
+			solution: null,
 		}
-
 
 		// This binding is necessary to make 'this' work in the callback
 		this.onKeyDown = this.onKeyDown.bind(this);
 	}
 
-	focusFirstAvailableInput() {
-		let input = $(".board-row").eq(this.state.currentRow).find('input:enabled:first');
-		input.focus();
+	render() {
+		let rows = [];
+		for(let i=0; i<this.state.nbRows;i++){
+			rows.push(this.renderRow(i));
+		}
+		return (
+			<div className="board">
+				{rows}
+			</div>
+		);
 	}
 
 	componentDidUpdate(prevProps) {
 		this.focusFirstAvailableInput();
 	}
 	componentDidMount(prevProps) {
-		this.focusFirstAvailableInput();
+		this.fetchWord();
+	}
+
+	fetchWord() {
+		let data = {'nb_cols': this.state.nbCols};
+		fetch('http://localhost:8000/board/word-fetch', {
+			'method': 'POST',
+			'body': JSON.stringify(data),
+		})
+		.then(res => res.json())
+		.then(
+			(result) => {
+				if(result.error){
+					console.log('result.error ', result.error);
+					return;
+				}
+				console.log(result.word);
+				this.setState({'solution': result.word});
+			},
+			(error) => console.log('(error) ', error)
+		)
+		.catch(
+			(error) => console.log('error catch ', error)
+		);
 	}
 
 	renderRow(i) {
@@ -84,7 +115,6 @@ class Board extends React.Component {
 			disabled={i!=this.state.currentRow}
 		/>;
 	}
-
 	onInput(e) {
 		let target = $(e.target);
 		let data = e.nativeEvent.data;
@@ -124,6 +154,13 @@ class Board extends React.Component {
 		return false;
 	}
 
+	focusFirstAvailableInput() {
+		let input = $(".board-row").eq(this.state.currentRow).find('input:enabled:first');
+		input.focus();
+	}
+
+	
+
 	getCurrentWord() {
 		let inputs = $(".board-row").eq(this.state.currentRow).find('input');
 		let word = "";
@@ -150,7 +187,10 @@ class Board extends React.Component {
 	}
 
 	validateAndSubmitWord() {
-		let data = {'word': this.getCurrentWord()};
+		let data = {
+			'word': this.getCurrentWord(),
+			'solution': this.state.solution,
+		};
 		let diff = false;
 
 		fetch('http://localhost:8000/board/word-check', {
@@ -166,7 +206,7 @@ class Board extends React.Component {
 				}
 				diff = result.diff;
 			},
-			(error) => console.log('(error) ', result.error)
+			(error) => console.log('(error) ', error)
 		)
 		.then(
 			() => {
@@ -178,18 +218,6 @@ class Board extends React.Component {
 		)
 		.catch(
 			(error) => console.log('error catch ', error)
-		);
-	}
-
-	render() {
-		let rows = [];
-		for(let i=0; i<this.state.nbRows;i++){
-			rows.push(this.renderRow(i));
-		}
-		return (
-			<div className="board">
-				{rows}
-			</div>
 		);
 	}
 
