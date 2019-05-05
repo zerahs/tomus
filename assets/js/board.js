@@ -61,7 +61,7 @@ class Board extends React.Component {
 
 		this.state = {
 			nbCols: nbCols,
-			nbRows: 20,
+			nbRows: 10,
 			currentRow: 0,
 			validLetters: validLetters,
 			solution: null,
@@ -83,48 +83,6 @@ class Board extends React.Component {
 		);
 	}
 
-	fillValidLetters(row) {
-		let inputs = $(".board-row").eq(row).find('input');
-		let validLetters = this.state.validLetters;
-		inputs.each(function(i){
-			$(this).val(validLetters.charAt(i).toUpperCase());
-		});
-	}
-	componentDidUpdate(prevProps) {
-		this.focusFirstAvailableInput();
-	}
-	componentDidMount(prevProps) {
-		this.fetchWord();
-	}
-
-	fetchWord() {
-		let data = {'nb_cols': this.state.nbCols};
-		fetch('http://localhost:8000/board/word-fetch', {
-			'method': 'POST',
-			'body': JSON.stringify(data),
-		})
-		.then(res => res.json())
-		.then(
-			(result) => {
-				if(result.error){
-					console.log('result.error ', result.error);
-					return;
-				}
-				console.log(result.word);
-				let validLetters = this.state.validLetters;
-				validLetters = validLetters.replaceAt(0, result.word.charAt(0));
-				this.setState({'validLetters': validLetters});
-				this.setState({'solution': result.word});
-				this.fillValidLetters(0);
-
-			},
-			(error) => console.log('(error) ', error)
-		)
-		.catch(
-			(error) => console.log('error catch ', error)
-		);
-	}
-
 	renderRow(i) {
 		return <Row
 			nbCols={this.state.nbCols}
@@ -134,6 +92,15 @@ class Board extends React.Component {
 			disabled={i!=this.state.currentRow}
 		/>;
 	}
+
+	componentDidUpdate(prevProps) {
+		this.focusFirstAvailableInput();
+	}
+
+	componentDidMount(prevProps) {
+		this.fetchWord();
+	}
+
 	onInput(e) {
 		let target = $(e.target);
 		let data = e.nativeEvent.data;
@@ -171,6 +138,42 @@ class Board extends React.Component {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
+	}
+
+	fillValidLetters(row) {
+		let inputs = $(".board-row").eq(row).find('input');
+		let validLetters = this.state.validLetters;
+		inputs.each(function(i){
+			$(this).val(validLetters.charAt(i).toUpperCase());
+		});
+	}
+	
+	fetchWord() {
+		let data = {'nb_cols': this.state.nbCols};
+		fetch('http://localhost:8000/board/word-fetch', {
+			'method': 'POST',
+			'body': JSON.stringify(data),
+		})
+		.then(res => res.json())
+		.then(
+			(result) => {
+				if(result.error){
+					$("#error-container").html(result.error);
+					return;
+				}
+				console.log(result.word);
+				let validLetters = this.state.validLetters;
+				validLetters = validLetters.replaceAt(0, result.word.charAt(0));
+				this.setState({'validLetters': validLetters});
+				this.setState({'solution': result.word});
+				this.fillValidLetters(0);
+
+			},
+			(error) => console.log('(error) ', error)
+		)
+		.catch(
+			(error) => console.log('error catch ', error)
+		);
 	}
 
 	focusFirstAvailableInput() {
@@ -226,10 +229,11 @@ class Board extends React.Component {
 		.then(
 			(result) => {
 				if(result.error){
-					console.log('result.error ', result.error);
+					$("#error-container").html(result.error);
 					return;
 				}
 				diff = result.diff;
+				$("#error-container").html("");
 			},
 			(error) => console.log('(error) ', error)
 		)
